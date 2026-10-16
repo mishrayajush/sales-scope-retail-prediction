@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Estimate daily retail store sales from store details, dates and planned promotions. A machine learning capstone using historical Rossmann data.">
+  <title>SalesScope — Daily sales estimates</title>
+  <link rel="stylesheet" href="{{ url_for('static',filename='salescope.css') }}">
+  <script defer src="{{ url_for('static',filename='history.js') }}"></script>
+  <script defer src="{{ url_for('static',filename='salescope.js') }}"></script>
+</head>
+<body>
+<a class="skip" href="#forecast">Skip to sales estimator</a>
+<div class="shell">
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="SalesScope home"><span class="brand-mark" aria-hidden="true">s.</span>SalesScope</a>
+    <nav aria-label="Main navigation"><a href="#forecast" class="nav-active">Sales estimator</a><a href="#about">How it works</a></nav>
+    <button class="theme-button" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false"><span id="theme-icon" aria-hidden="true">◐</span><span id="theme-label">Dark mode</span></button>
+  </header>
+  <main>
+    <section class="intro">
+      <p class="eyebrow"><span></span> RETAIL SALES PREDICTION</p>
+      <h1>How much could your<br>store sell <em>in a day?</em></h1>
+      <p class="lead">Choose a store, pick a date, and tell us what’s planned.<br class="desktop-break"> Get an estimated daily sales amount in seconds.</p>
+      <p class="dataset-note"><span class="note-icon" aria-hidden="true">i</span> A learning demo using Rossmann sales from 2013–2015. Current-date estimates are unvalidated.</p>
+    </section>
+    {% if ready %}
+    <section class="history-section" id="forecast" aria-label="Store history">
+      <div class="section-heading"><div><p class="eyebrow">01 · EXPLORE A STORE</p><h2>Start with its sales history.</h2></div></div>
+      <div class="store-picker-grid">
+        <div class="category-picker">
+          <div class="field"><label for="category">Select Category</label><select id="category"><option value="">Select Category</option></select></div>
+          <div class="field category-store-field"><label for="category-store">Stores in this category</label><select id="category-store" disabled><option value="">Select a category first</option></select><small id="category-count">Choose a category to browse its stores.</small></div>
+        </div>
+        <div class="field store-search"><label for="store">Or search by store number</label><input id="store" name="store" form="forecast-form" type="text" value="1" placeholder="Try a store number, e.g. 11…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="store-suggestions" aria-expanded="false" aria-describedby="store-help alias-note" required><div id="store-suggestions" class="store-suggestions" role="listbox" aria-label="Matching stores" hidden></div><small id="store-help">Search all stores by number or example name.</small><small id="alias-note">Example store names and categories for this presentation.</small><script id="store-ids" type="application/json">{{ stores|tojson }}</script></div>
+      </div>
+      <div class="history-heading"><div><h3 id="history-title">Actual historical sales</h3><p id="history-range">Select a store to see the data used during its training period.</p></div><div class="period-tabs" role="group" aria-label="Sales history interval"><button type="button" data-period="week" aria-pressed="true">Weekly</button><button type="button" data-period="month" aria-pressed="false">Monthly</button><button type="button" data-period="year" aria-pressed="false">Yearly</button></div></div>
+      <p id="history-status" class="history-status" role="status">Loading sales history…</p>
+      <div id="history-chart" class="history-chart" aria-busy="true"></div>
+      <div class="history-footer"><span>Actual sales · Total sales per selected period · Closed days included</span><span>Partial periods are marked with an asterisk (*).</span></div>
+      <details class="history-table"><summary>View the sales figures</summary><div class="table-scroll"><table><caption>Historical sales totals for the selected store</caption><thead><tr><th scope="col">Period</th><th scope="col">Total sales</th><th scope="col">Observed days</th></tr></thead><tbody id="history-table-body"></tbody></table></div></details>
+    </section>
+    <section class="workspace" id="prediction" aria-label="Sales estimator">
+      <form id="forecast-form" class="input-panel">
+        <div class="section-heading"><div><p class="eyebrow">02 · PREDICT A DAY</p><h2>What could it sell next?</h2></div></div>
+        <p id="prediction-store" class="prediction-store">Choose a store above, then select the day to estimate.</p>
+        <div>
+          <div class="field"><label for="date">Prediction date</label><input id="date" name="date" type="date" min="{{ start }}" max="{{ maximum }}" required><small>Choose a date to request an estimate. History is available without selecting a date.</small></div>
+        </div>
+        <div class="step-heading second"><h3>Add the day’s details</h3></div>
+        <label class="check-row" for="promo"><span><strong>Sale or promotion planned</strong><small>For example, a discount or special offer.</small></span><input id="promo" name="promo" type="checkbox"><span class="switch-track" aria-hidden="true"></span></label>
+        <details class="optional-details"><summary>Optional day details <span>Opening & holidays</span></summary>
+        <p class="optional-note">The store is assumed open, with no public or school holiday, unless you change these settings. Confirm holidays for the store’s location using a reliable local calendar. SalesScope does not detect holidays automatically.</p>
+        <label class="check-row" for="open"><span><strong>Store is open</strong><small>Switch off for a planned closure. Closed stores have zero sales.</small></span><input id="open" name="open" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></label>
+        <div class="field holiday-field"><label for="holiday">Public holiday</label><select id="holiday" name="holiday"><option value="0">No public holiday</option><option value="a">Public holiday</option><option value="b">Easter</option><option value="c">Christmas</option></select></div>
+        <label class="school-check"><input id="school" name="school" type="checkbox"> Schools are on holiday</label>
+        </details>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+        <button class="predict-button" id="predict-button" type="submit"><span>Estimate daily sales</span><span aria-hidden="true">↗</span></button>
+        <p class="form-footnote">No account needed. Change your inputs to explore another day.</p>
+      </form>
+      <aside class="result-panel" aria-label="Prediction result" aria-live="polite" aria-atomic="true">
+        <div class="result-top"><span class="eyebrow">YOUR ESTIMATE</span><span class="result-state" id="result-state">Ready when you are</span></div>
+        <div id="empty-result" class="empty-result"><span class="empty-symbol" aria-hidden="true">↗</span><h2>A little planning.<br>A clearer estimate.</h2><p>Complete the details on the left and select <strong>Estimate daily sales.</strong></p><span class="empty-rule"></span><p class="small-note">Your result will show an estimated sales amount for the store and date you choose.</p></div>
+        <div id="filled-result" class="filled-result" hidden><p id="result-context" class="result-context"></p><p class="result-label">Estimated daily sales</p><p class="result-value" id="result-value"></p><p class="result-units">Sales units from the original dataset</p><p class="result-explanation" id="result-explanation"></p><div id="scenario" class="scenario"></div><p id="horizon-warning" class="horizon-warning" hidden>Demonstration only. This date is beyond the six-week period used to evaluate the model; reliability here is unverified.</p><p id="stale-note" class="stale-note" hidden>Inputs changed. Select Estimate daily sales to update this result.</p></div>
+        <div class="result-bottom"><span aria-hidden="true">◇</span><p>An estimate, not a guarantee.<br>Use it to explore patterns, not make current business decisions.</p></div>
+      </aside>
+    </section>
+    {% else %}<section class="unavailable"><h2>Model setup required</h2><p>Add the Rossmann dataset and run the training notebook, then restart this page.</p></section>{% endif %}
+    <section class="about" id="about"><div><p class="eyebrow">BEHIND THE ESTIMATE</p><h2>Historical patterns.<br>One day at a time.</h2></div><div class="about-copy"><p>SalesScope uses a machine learning model to estimate a store’s daily sales from calendar patterns, store information, and planned promotions.</p><details><summary>What should I know about these predictions?</summary><p>The model learned from data through {{ training_end|default('June 2015') }}. It was evaluated on the following six weeks. Later dates are available as demonstrations, but recent data is needed to assess current forecasting performance.</p><p>Sales are in the original dataset’s units. Promotion associations do not establish causal effects. A store number identifies an existing dataset branch, not a new store you can add.</p></details></div></section>
+  </main>
+  <footer><span class="footer-brand">SalesScope</span><span>Retail Sales Prediction · Individual capstone project</span><a href="#forecast">Back to estimator ↑</a></footer>
+</div>
+</body></html>

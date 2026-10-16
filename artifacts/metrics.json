@@ -1,0 +1,116 @@
+{
+  "selected_model": "Ridge",
+  "validation": {
+    "Baseline": {
+      "all": {
+        "MAE": 891.5757068437377,
+        "RMSE": 1339.0136293303253,
+        "R2": 0.8872338600635862,
+        "rows": 46830
+      },
+      "open": {
+        "MAE": 1114.2019681235088,
+        "RMSE": 1496.8829612256736,
+        "R2": 0.7585416361969775,
+        "rows": 37473
+      }
+    },
+    "Ridge": {
+      "all": {
+        "MAE": 828.2534328196631,
+        "RMSE": 1250.2980490237712,
+        "R2": 0.9016813681814494,
+        "rows": 46830
+      },
+      "open": {
+        "MAE": 1035.0681359630887,
+        "RMSE": 1397.7078388465652,
+        "R2": 0.789477089633064,
+        "rows": 37473
+      }
+    },
+    "RandomForest": {
+      "all": {
+        "MAE": 1367.8782561282871,
+        "RMSE": 2008.1271846493273,
+        "R2": 0.7463755313993314,
+        "rows": 46830
+      },
+      "open": {
+        "MAE": 1709.4371610089315,
+        "RMSE": 2244.884817325573,
+        "R2": 0.4569314047349662,
+        "rows": 37473
+      }
+    }
+  },
+  "test": {
+    "all": {
+      "MAE": 852.0934199344081,
+      "RMSE": 1280.9628378105172,
+      "R2": 0.8818146445603152,
+      "rows": 46830
+    },
+    "open": {
+      "MAE": 990.6046088954948,
+      "RMSE": 1381.1571527138958,
+      "R2": 0.7955645637967188,
+      "rows": 40282
+    }
+  },
+  "scope": "1115 stores; full dataset",
+  "splits": {
+    "train": {
+      "start": "2013-01-01",
+      "end": "2015-05-08",
+      "rows": 923549
+    },
+    "validation": {
+      "start": "2015-05-09",
+      "end": "2015-06-19",
+      "rows": 46830
+    },
+    "test": {
+      "start": "2015-06-20",
+      "end": "2015-07-31",
+      "rows": 46830
+    }
+  },
+  "missing": {
+    "Store": 0,
+    "DayOfWeek": 0,
+    "Date": 0,
+    "Sales": 0,
+    "Customers": 0,
+    "Open": 0,
+    "Promo": 0,
+    "StateHoliday": 0,
+    "SchoolHoliday": 0,
+    "StoreType": 0,
+    "Assortment": 0,
+    "CompetitionDistance": 2642,
+    "CompetitionOpenSinceMonth": 323348,
+    "CompetitionOpenSinceYear": 323348,
+    "Promo2": 0,
+    "Promo2SinceWeek": 508031,
+    "Promo2SinceYear": 508031,
+    "PromoInterval": 508031
+  },
+  "duplicates": 0,
+  "source": "https://www.kaggle.com/c/rossmann-store-sales/data",
+  "versions": {
+    "sklearn": "1.9.1",
+    "pandas": "3.0.6"
+  },
+  "settings": {
+    "seed": 42,
+    "trees": 100,
+    "ridge_alpha": 10,
+    "forest_max_depth": 18,
+    "forest_min_samples_leaf": 5
+  },
+  "sha256": {
+    "train.csv": "f6e4597c142d7d909a13d53b68a8e85c00b9a4c7b5ff40adbb37d6829cc1f4cc",
+    "store.csv": "f56bd124a2849489e6bbb5c000f5fc9640204355e316475c918ae4d089afb344"
+  }
+}
